@@ -1,0 +1,9 @@
+* {
+  scrollbar-width: none;
+  font-family: "Work Sans", sans-serif;
+}
+
+.header_container {
+  height: 15vh;
+  width: 100vw;
+}
