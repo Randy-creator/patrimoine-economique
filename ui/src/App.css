@@ -8,4 +8,14 @@
   width: 100vw;
 }
 
+.tableau_patrimoine tr {
+  border: 1px solid black;
+}
 
+.valeur_retour {
+  height: 12vh;
+  width: 35vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

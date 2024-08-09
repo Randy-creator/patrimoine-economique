@@ -12,23 +12,22 @@ const TableauPatrimoine = () => {
         fetch('/data.json')
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    throw new Error('toa tsy mandeha !');
                 }
                 return response.json();
             })
             .then(data => {
-                const patrimoinesTableauFiltrer = data.filter(objet => objet.model === "Patrimoine");
+                const patrimoinesTableauFiltrer = data.filter(objet => objet.model == "Patrimoine");
                 setPatrimoines(patrimoinesTableauFiltrer);
             })
             .catch(error => {
-                console.error(error);
+                console.error("misy erreur le fetch !",error);
             });
     }, []);
 
     const handleDateChange = (event, index) => {
-        setDateFin(prevDates => ({
-            ...prevDates,
-            [index]: event.target.value
+        setDateFin(datePrecedentes => ({
+            ...datePrecedentes, [index]: event.target.value
         }));
     };
 
@@ -39,16 +38,16 @@ const TableauPatrimoine = () => {
             return;
         }
 
-        const patrimoine = patrimoines[index];
-        const possessions = patrimoine.data.possessions;
+        let patrimoine = patrimoines[index];
+        let possessions = patrimoine.data.possessions;
         const total = possessions.reduce((sum, possession) => {
             const dateDebut = new Date(possession.dateDebut);
-            const valeurActuelle = possession.valeur - (date.getTime() - dateDebut.getTime()) * (possession.tauxAmortissement || 0) / 100 / (1000 * 3600 * 24 * 365);
+            let valeurActuelle = possession.valeur - (date.getTime() - dateDebut.getTime()) * (possession.tauxAmortissement || 0) / 100 / (1000 * 3600 * 24 * 365);
             return sum + valeurActuelle;
         }, 0);
 
         setValeursTotales(valeurAfficher => ({
-            ...valeurAfficher,[index]: total
+            ...valeurAfficher, [index]: total
         }));
     };
 
@@ -56,8 +55,8 @@ const TableauPatrimoine = () => {
         <div>
             {patrimoines.map((patrimoine, index) => (
                 <div key={index} className="container mt-4">
-                    <h2 className="mb-4">Patrimoine de {patrimoine.data.possesseur.nom}</h2>
-                    <Table responsive bordered hover>
+                    <h2 className="mb-7">Patrimoine de {patrimoine.data.possesseur.nom}</h2>
+                    <Table responsive bordered hover className='tableau_patrimoine'>
                         <thead>
                             <tr>
                                 <th>Libellé</th>
@@ -72,11 +71,11 @@ const TableauPatrimoine = () => {
                             {patrimoine.data.possessions.map((possession, possessionIndex) => (
                                 <tr key={possessionIndex}>
                                     <td>{possession.libelle}</td>
-                                    <td>{possession.valeur}</td>
+                                    <td>{possession.valeur} MGA</td>
                                     <td>{new Date(possession.dateDebut).toLocaleDateString()}</td>
-                                    <td>{possession.tauxAmortissement !== null ? possession.tauxAmortissement : '0'}</td>
-                                    <td>{possession.jour !== undefined ? possession.jour : '0'}</td>
-                                    <td>{possession.valeurConstante !== undefined ? possession.valeurConstante : '0'}</td>
+                                    <td>{possession.tauxAmortissement != null ? possession.tauxAmortissement : '0'}%</td>
+                                    <td>{possession.jour != undefined ? possession.jour : '0'}</td>
+                                    <td>{possession.valeurConstante != undefined ? Math.abs(possession.valeurConstante) : '0'} MGA</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -84,19 +83,19 @@ const TableauPatrimoine = () => {
 
                     <Form>
                         <Form.Group className="mb-3">
-                            <Form.Label>Date de Fin</Form.Label>
-                            <Form.Control 
-                                type="date" 
+                            <Form.Label className='fw-bold'>Date de Fin</Form.Label>
+                            <Form.Control
+                                type="date"
                                 value={dateFin[index] || ''}
                                 className='w-25 border border-black'
-                                onChange={(e) => handleDateChange(e, index)} 
+                                onChange={(e) => handleDateChange(e, index)}
                             />
                         </Form.Group>
-                        <Button variant="success" onClick={() => handleSubmit(index)}>Calculer la valeur totale</Button>
+                        <Button variant="success" onClick={() => handleSubmit(index)}>Valeur totale du patrimoine</Button>
                     </Form>
-                    {valeursTotales[index] !== undefined && (
+                    {valeursTotales[index] != undefined && (
                         <div className="mt-4 d-flex justify-content-center align-items-center">
-                            <h4>Valeur Totale à la Date Sélectionnée: {valeursTotales[index].toFixed(2)} mga</h4>
+                            <h4 className='text-center text-light bg-danger valeur_retour rounded-pill fs-5'>Valeur Totale du patrimoine de {patrimoine.data.possesseur.nom} : {valeursTotales[index].toFixed(2)} MGA</h4>
                         </div>
                     )}
                 </div>

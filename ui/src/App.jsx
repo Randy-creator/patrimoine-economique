@@ -6,7 +6,7 @@ import TableauPatrimoine from './tableauPatrimoine';
 
 const Header = () => {
   return (
-    <Container className="d-flex justify-content-center align-items-center bg-success text-light text-center my-4 h-50 w-50">
+    <Container className="d-flex justify-content-center align-items-center bg-success text-light text-center my-4 h-50 w-50 rounded-pill">
       <h1 className='fs-2'>Patrimoine économique</h1>
     </Container>
   );
