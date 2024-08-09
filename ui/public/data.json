@@ -63,5 +63,28 @@
         }
       ]
     }
+  },
+
+  {
+    "model": "Patrimoine",
+    "data": {
+      "possesseur": { "nom": "Jane Smith" },
+      "possessions": [
+        {
+          "libelle": "iPhone",
+          "valeur": 1200000,
+          "dateDebut": "2022-01-01T00:00:00.000Z",
+          "dateFin": null,
+          "tauxAmortissement": 10
+        },
+        {
+          "libelle": "Voiture",
+          "valeur": 20000000,
+          "dateDebut": "2021-07-15T00:00:00.000Z",
+          "dateFin": null,
+          "tauxAmortissement": 15
+        }
+      ]
+    }
   }
 ]
