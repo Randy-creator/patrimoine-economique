@@ -1,8 +1,9 @@
 import express from 'express';
-import{dirname} from 'path';
+import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import Patrimoine from '../models/Patrimoine.js';
 import createPossession from './createPossession.js';
+import updatePossession from './updatePossession.js';
 // fileURLToPath(import.meta.url) converts the module's URL to a file path.
 // dirname(__filename) then gives you the directory name of the current file.
 
@@ -15,21 +16,22 @@ const __dirname = dirname(__filename);
 const app = express();
 app.use(express.json());
 
-const port = 5173; 
+const port = 5173;
 
 app.get("/possession", (req, res) => {
     res.sendFile(__dirname + "/data/data.json");
-}) 
+})
 
 app.post("/possession", (req, res) => {
     createPossession(req.body);
     res.send("200 OK")
 })
-// app.get("/patrimoine:date", (req, res) => {
-// const date = req.params.date;
-// const patrimoineValue = Patrimoine.getValeur(date);
-// res.sendFile(_dirname + patrimoineValue);
-// }) 
+
+app.put("/possession/:libelle", (req, res) => {
+    const libelle = req.params.libelle;
+    updatePossession(libelle, req.body)
+    res.send("200 Ok")
+})
 
 
 app.listen(port, () => {
