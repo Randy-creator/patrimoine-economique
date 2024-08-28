@@ -11,11 +11,11 @@ export default async function createPossession(req) {
     const dateFin = req.dateFin;
     const taux = req.tauxAmortissement;
 
-    const possession = new Possession(possesseur, libelle, valeur, dateDebut, dateFin, taux);
+    const newPossession = new Possession(possesseur, libelle, valeur, dateDebut, dateFin, taux);
     try {
         const response = await readFile("./data/data.json");
         const list = response.data;
-        list[1].data.possessions.push(possession);
+        list[1].data.possessions.push(newPossession);
 
         await writeFile("./data/data.json");
 

@@ -1,9 +1,9 @@
 import express from 'express';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import Patrimoine from '../models/Patrimoine.js';
 import createPossession from './createPossession.js';
 import updatePossession from './updatePossession.js';
+import closePossession from './closePossession.js';
 // fileURLToPath(import.meta.url) converts the module's URL to a file path.
 // dirname(__filename) then gives you the directory name of the current file.
 
@@ -24,19 +24,25 @@ app.get("/possession", (req, res) => {
 
 app.post("/possession", (req, res) => {
     createPossession(req.body);
-    res.send("200 OK")
+    res.send("200 OK");
 })
 
 app.put("/possession/:libelle", (req, res) => {
     const libelle = req.params.libelle;
-    updatePossession(libelle, req.body)
-    res.send("200 Ok")
+    updatePossession(libelle, req.body);
+    res.send("200 Ok");
+})
+
+app.put("/possession/:libelle/close", (req, res) => {
+    const libelle = req.params.libelle;
+    closePossession(libelle, req.body);
+    res.send("200 Ok");
 })
 
 
 app.listen(port, () => {
-    console.log(`listen to port ${port}...`)
+    console.log(`listen to port ${port}...`);
 })
 
-//remember my futur self: this is a the link where u found how to do it in the first place : 
+//some tutorial about express/nodejs  
 // https://dev.to/faraib/how-to-setup-a-local-endpoint-with-express-and-nodejs-54p5
