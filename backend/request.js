@@ -1,72 +1,90 @@
 import express from "express";
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-
-
+import path from "path";
+import cors from "cors";
 import createPossession from "./createPossession.js";
 import updatePossession from "./updatePossession.js";
 import closePossession from "./closePossession.js";
 import getValeurPatrimoine from "./getValeurPatrimoine.js";
 import getRange from "./getRange.js";
 
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-// fileURLToPath(import.meta.url) converts the module's URL to a file path.
-// dirname(__filename) then gives you the directory name of the current file.
-
 
 const app = express();
-const port = 5173;
-
+const port = 3000;
 app.use(express.json());
+app.use(cors());
 
 app.get("/possession", (req, res) => {
-  res.sendFile(__dirname + "/data/data.json");
+  res.set({
+    "Content-Type": "application/json",
+  });
+  res.sendFile(path.join(__dirname, "../data/data.json"));
 });
 
 app.post("/possession", (req, res) => {
-  createPossession(req.body);
-  res.status(201).send({
-    message: "add new possession",
-    possession: { ...req.body, dateFin: null },
+  res.set({
+    "Content-Type": "application/json",
+  });
+
+  createPossession(req.body).then(() => {
+    const response = {
+      message: "add new possession",
+      possession: { ...req.body, dateFin: null },
+    };
+    res.status(201).send(response);
   });
 });
 
 app.put("/possession/:libelle", (req, res) => {
+  res.set({
+    "Content-Type": "application/json",
+  });
   const libelle = req.params.libelle;
-  try {
-    updatePossession(libelle, req.body);
-    res.send("200 OK");
-  } catch (err) {
-    res.status(400).send({ error: err });
-  }
+
+  updatePossession(libelle, req.body)
+    .then(() => {
+      res.status(200).send({ message: "possession " + libelle + " updated" });
+    })
+    .catch((err) => res.status(400).send({ error: err }));
 });
 
 app.put("/possession/:libelle/close", (req, res) => {
   const libelle = req.params.libelle;
+  res.set({
+    "Content-Type": "application/json",
+  });
+
   try {
     closePossession(libelle);
-    res.send("200 OK");
-  } catch (err) {
-    res.status(400).send({ error: err });
+    res.status(200).send({ message: "possession " + libelle + " closed" });
+  } catch (error) {
+    res.status(400).send({ error: error });
   }
 });
-
 app.post("/patrimoine/range", (req, res) => {
-  const result = getRange(req.body);
-  res.status(200).send({ data: result });
+  res.set({
+    "Content-Type": "application/json",
+  });
+  getRange(req.body)
+    .then((result) => res.status(200).send({ data: result }))
+    .catch((err) => res.status(400).send({ status: "failed", error: err }));
 });
 
 app.get("/patrimoine/:date", (req, res) => {
   const jour = req.params.date;
-  try {
-    const result = getValeurPatrimoine(new Date(jour));
-    res.status(200).send({ valeurPatrimoine: result });
-  } catch (err) {
-    res.status(400).send({ status: "failed", error: err });
-  }
+  res.set({
+    "Content-Type": "application/json",
+  });
+  getValeurPatrimoine(new Date(jour))
+    .then((result) => {
+      res.status(200).send({ valeurPatrimoine: result });
+    })
+    .catch((err) => res.status(400).send({ status: "failed", error: err }));
 });
 
 app.listen(port, () => {
-  console.log(`Listening on port ${port}...`);
+  console.log(`Patrimoine app listening on port ${port}`);
 });

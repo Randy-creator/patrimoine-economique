@@ -1,44 +1,47 @@
-import { readFile } from "../data/index.js";
+import { readFile, writeFile } from "../data/index.js";
 import Patrimoine from "../models/Patrimoine.js";
 import Personne from "../models/Personne.js";
 import Flux from "../models/possessions/Flux.js";
 import Possession from "../models/possessions/Possession.js";
 
 export default async function getValeurPatrimoine(date) {
-    const arrPossession = [];
-    const possesseur = new Personne("John Doe");
+  const possesseur = new Personne("John Doe");
+  const possessionList = [];
 
-    const response = await readFile("../data/data.json");
-    const data = response.data;
-    const possessions = data[1].data.possessions;
+  const response = await readFile("../data/data.json");
+  const data = response.data;
+  const possessions = data[1].data.possessions;
 
-    for (const possession of possessions) {
-        if (possession.jour == undefined) {
-            arrPossession.push(
-                new Possession(
-                    possesseur,
-                    possession.libelle,
-                    possession.valeur,
-                    new Date(possession.dateDebut),
-                    possession.dateFin,
-                    possession.tauxAmortissement,
-                ),
-            );
-        } else {
-            arrPossession.push(
-                new Flux(
-                    possesseur,
-                    possession.libelle,
-                    possession.valeur,
-                    new Date(possession.dateDebut),
-                    possession.dateFin,
-                    possession.tauxAmortissement,
-                    possession.jour,
-                ),
-            );
-        }
+  for (const possession of possessions) {
+    if (possession.jour == undefined) {
+      possessionList.push(
+        new Possession(
+          possesseur,
+          possession.libelle,
+          possession.valeur,
+          new Date(possession.dateDebut),
+          possession.dateFin,
+          possession.tauxAmortissement,
+        ),
+      );
+    } else {
+      possessionList.push(
+        new Flux(
+          possesseur,
+          possession.libelle,
+          possession.valeur,
+          new Date(possession.dateDebut),
+          possession.dateFin,
+          possession.tauxAmortissement,
+          possession.jour,
+        ),
+      );
     }
+  }
 
-    const patrimoine = new Patrimoine(possesseur, arrPossession);
-    return patrimoine.getValeur(date);
+  const patrimoine = new Patrimoine(possesseur, possessionList);
+  return patrimoine.getValeur(date);
 }
+// list[1].data.possessions.push(newPossession);
+// const status = await writeFile("../data/data.json", data);
+// return status;
