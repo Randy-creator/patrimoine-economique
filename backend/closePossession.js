@@ -8,8 +8,8 @@ export default async function closePossession(newLibelle, oldLibelle) {
     const today = new Date();
     for (const possession of allPossessions) {
         if (possession.libelle == newLibelle && oldLibelle != null) {
-            possession.dateFin = today.getFullYear();
+            possession.dateFin = today;
         }
     }
-    await writeFile("./data/data.json");
+    await writeFile("./data/data.json", list);
 }

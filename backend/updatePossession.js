@@ -1,17 +1,17 @@
 import { readFile, writeFile } from "./data/index.js";
 
-export default async function updatePossession(newLibelle, oldLibelle) {
+export default async function updatePossession(libelle, data) {
     const response = await readFile("./data/data.json");
     const list = response.data;
     const allPossessions = list[1].data.possessions;
 
     for (const possession of allPossessions) {
-        if (possession.libelle == newLibelle) {
-            if (oldLibelle.libelle != null) {
-                possession.libelle = oldLibelle.libelle;
+        if (possession.libelle == libelle) {
+            if (data.libelle != null) {
+                possession.libelle = data.libelle;
             }
-            possession.dateFin = new Date(oldLibelle.dateFin);
+            possession.dateFin = new Date(data.dateFin);
         }
     }
-    await writeFile("./data/data.json");
+    await writeFile("./data/data.json", list);
 }

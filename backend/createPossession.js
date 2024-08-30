@@ -17,9 +17,9 @@ export default async function createPossession(req) {
         const list = response.data;
         list[1].data.possessions.push(newPossession);
 
-        await writeFile("./data/data.json");
+        await writeFile("./data/data.json", list);
 
     } catch (error) {
-
+        console.error(error);
     }
 }
