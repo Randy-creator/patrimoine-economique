@@ -52,7 +52,7 @@ const Patrimoine = () => {
       console.log("Données reçues:", result);
 
       const label = Object.keys(result.data);
-        const value = Object.values(result.data);
+      const value = Object.values(result.data);
 
       const chartData = {
         labels: label,
@@ -60,8 +60,8 @@ const Patrimoine = () => {
           {
             label: "Valeur du Patrimoine",
             data: value,
-            backgroundColor: "rgb(11, 110, 79, 0.75)",
-            borderColor: "rgb(224, 224, 226)",
+            backgroundColor: "rgba(75, 192, 192, 0.2)",
+            borderColor: "rgb(75, 192, 192)",
             borderWidth: 1,
           },
         ],
@@ -79,7 +79,6 @@ const Patrimoine = () => {
       <DatePicker
         selected={dateDebut}
         onChange={(date) => setDateDebut(date)}
-        
       />
       <DatePicker selected={dateFin} onChange={(date) => setDateFin(date)} />
       <select value={jour} onChange={(e) => setJour(e.target.value)}>
