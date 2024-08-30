@@ -88,7 +88,7 @@ const PossessionsTable = () => {
         setResultat("Les valeurs saisies ne sont pas valides!");
       } else {
         setResultat(
-          `Le patrimoine de ${patrimoine.possesseur.nom} à la date ${date.toLocaleDateString()} est de : ${valeur} Ar`,
+          `Le patrimoine de ${patrimoine.possesseur.nom} à la date ${date.toLocaleDateString()} est de : ${valeur.toFixed(1 )} Ar`,
         );
       }
     } else {
@@ -152,12 +152,12 @@ const PossessionsTable = () => {
       <Table id="table" striped bordered hover>
         <thead>
           <tr>
-            <th>Libellé</th>
-            <th>Valeur Initiale</th>
-            <th>Date Début</th>
-            <th>Date Fin</th>
-            <th>Amortissement</th>
-            <th>Actions</th>
+            <th style={{ width: '10%' }}>Libellé</th>
+            <th style={{ width: '10%' }}>Valeur Initiale</th>
+            <th style={{ width: '10%' }}>Date Début</th>
+            <th style={{ width: '10%' }}>Date Fin</th>
+            <th style={{ width: '5%' }}>Amortissement</th>
+            <th style={{ width: '15%' }}>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -180,7 +180,7 @@ const PossessionsTable = () => {
                   ? `${possession.tauxAmortissement} %`
                   : ""}
               </td>
-              <td>
+              <td className="container d-flex justify-content-around">
                 <Button
                   onClick={() => handleShowUpdateModal(possession)}
                   variant="success"
@@ -198,28 +198,33 @@ const PossessionsTable = () => {
           ))}
         </tbody>
       </Table>
-      <div id="dateFinContainer">
+
+        <Button variant="success" onClick={handleShowCreateModal} className="container d-flex justify-content-center mt-6">
+          Ajouter une nouvelle possession
+        </Button>
+
+      <div id="dateFinContainer" className="container d-flex justify-content-evenly mt-4">
         <Form.Group controlId="dateFin">
           <Form.Control
             type="date"
             value={dateFin}
             onChange={(e) => setDateFin(e.target.value)}
+            className="w-100 border border-dark"
           />
         </Form.Group>
         <Button id="btn" onClick={handleCalculate}>
           Calculer le patrimoine
         </Button>
-        <Button variant="success" onClick={handleShowCreateModal}>
-          Ajouter une nouvelle possession
-        </Button>
+        
       </div>
 
-      <Form.Group controlId="resultat">
+      <Form.Group controlId="resultat" className="mt-4">
         <Form.Control
           type="text"
           placeholder="Résultat"
           value={resultat}
           readOnly
+          className="container border border-dark"s
         />
       </Form.Group>
 

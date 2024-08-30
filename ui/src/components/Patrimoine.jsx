@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Bar } from "react-chartjs-2";
+import './Patrimoine.css'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -60,7 +61,7 @@ const Patrimoine = () => {
           {
             label: "Valeur du Patrimoine",
             data: value,
-            backgroundColor: "rgba(75, 192, 192, 0.2)",
+            backgroundColor: "rgb(76, 145, 115, 0.2)",
             borderColor: "rgb(75, 192, 192)",
             borderWidth: 1,
           },
@@ -74,21 +75,25 @@ const Patrimoine = () => {
   };
 
   return (
-    <div>
-      <h2>Graphique du Patrimoine</h2>
-      <DatePicker
-        selected={dateDebut}
-        onChange={(date) => setDateDebut(date)}
-      />
-      <DatePicker selected={dateFin} onChange={(date) => setDateFin(date)} />
-      <select value={jour} onChange={(e) => setJour(e.target.value)}>
+    <div className="d-flex justify-content-center align-items-center flex-column">
+      <h1 className="d-flex justify-content-center fs-1 fw-bolder bg-success text-light">Statistique graphique du Patrimoine</h1>
+      <div className="d-flex border w-50 justify-content-between align-center">
+        <DatePicker
+          selected={dateDebut}
+          onChange={(date) => setDateDebut(date)}
+          className="datePicker"
+        />
+        <h1>to</h1>
+        <DatePicker selected={dateFin} onChange={(date) => setDateFin(date)} className="datePicker" />
+      </div>
+      <select value={jour} onChange={(e) => setJour(e.target.value)} className="mt-4">
         {[...Array(31).keys()].map((day) => (
           <option key={day + 1} value={day + 1}>
             {day + 1}
           </option>
         ))}
       </select>
-      <button onClick={handleGetValeur}>Valider</button>
+      <button onClick={handleGetValeur} className="btn btn-success mt-4">Valider</button>
       <Bar
         data={data}
         options={{
