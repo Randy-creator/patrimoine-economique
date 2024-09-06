@@ -1,6 +1,6 @@
 import Personne from "./models/Personne.js"
 import Possession from "./models/possessions/Possession.js";
-import { readFile, writeFile } from "../data/index.js";
+import { readFile, writeFile } from "./data/index.js";
 
 const possesseur = new Personne("John Doe");
 
@@ -27,10 +27,10 @@ export default async function createPossession(possessionInfo) {
       taux,
     );
 
-    const response = await readFile("../data/data.json");
+    const response = await readFile("./data/data.json");
     const list = response.data;
     list[1].data.possessions.push(newPossession);
-    const status = await writeFile("../data/data.json", response.data);
+    const status = await writeFile("./data/data.json", response.data);
     return status;
   } catch (err) {
     console.log(possessionInfo);

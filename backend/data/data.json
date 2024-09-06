@@ -16,10 +16,10 @@
                     "possesseur": {
                         "nom": "John Doe"
                     },
-                    "libelle": "MacBook Pro",
+                    "libelle": "MacBook ",
                     "valeur": 4300000,
                     "dateDebut": "2023-12-25T00:00:00.000Z",
-                    "dateFin": null,
+                    "dateFin": "2024-09-06T14:07:47.608Z",
                     "tauxAmortissement": 5
                 },
                 {
@@ -80,4 +80,3 @@
         }
     }
 ]
-
