@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Table, Form, Button, Modal } from "react-bootstrap";
-import Patrimoine from "../../models/Patrimoine.js";
-import Personne from "../../models/Personne.js";
-import Possession from "../../models/possessions/Possession.js";
-import Flux from "../../models/possessions/Flux.js";
+import Patrimoine from "./models/Patrimoine.js";
+import Personne from "./models/Personne.js";
+import Possession from "./models/possessions/Possession.js";
+import Flux from "./models/possessions/Flux.js";
 import CreatePossessionForm from "./components/createPossession.jsx";
 
 const PossessionsTable = () => {
   const [possessions, setPossessions] = useState([]);
-  const [dateFin, setDateFin] = useState("");
   const [patrimoine, setPatrimoine] = useState(null);
-  const [resultat, setResultat] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [selectedPossession, setSelectedPossession] = useState(null);
@@ -19,7 +17,8 @@ const PossessionsTable = () => {
 
   useEffect(() => {
     const possesseur = new Personne("John Doe");
-    async function fetchData() {
+
+    const fetchData = async () => {
       try {
         const response = await fetch("http://localhost:3000/possession");
         const result = await response.json();
@@ -34,9 +33,9 @@ const PossessionsTable = () => {
                 possession.libelle,
                 possession.valeur,
                 new Date(possession.dateDebut),
-                possession.dateFin,
+                possession.dateFin ? new Date(possession.dateFin) : null,
                 possession.tauxAmortissement,
-              ),
+              )
             );
           } else {
             possessionList.push(
@@ -45,57 +44,26 @@ const PossessionsTable = () => {
                 possession.libelle,
                 possession.valeur,
                 new Date(possession.dateDebut),
-                possession.dateFin,
+                possession.dateFin ? new Date(possession.dateFin) : null,
                 possession.tauxAmortissement,
                 possession.jour,
-              ),
+              )
             );
           }
         }
 
-        const patrimoine = new Patrimoine(possesseur, possessionList);
-        setPatrimoine(patrimoine);
+        const patrimoineInstance = new Patrimoine(possesseur, possessionList);
+        setPatrimoine(patrimoineInstance);
         setPossessions(possessionList);
       } catch (error) {
         console.error("Erreur lors de la récupération des données:", error.message);
-        console.error("Détails:", error);
       }
-    }
+    };
 
     fetchData();
   }, []);
 
-  const handleCalculate = () => {
-    if (patrimoine && dateFin) {
-      const date = new Date(dateFin);
-      if (isNaN(date.getTime())) {
-        setResultat("Format de Date non valide!");
-        return;
-      }
-
-      const possessionWithInvalidDate = possessions.find(
-        (possession) => date < new Date(possession.dateDebut),
-      );
-      if (possessionWithInvalidDate) {
-        setResultat(
-          "Le calcul du patrimoine ne peut pas se faire car certaines possessions ne sont pas encore acquises à cette date.",
-        );
-        return;
-      }
-
-      const valeur = patrimoine.getValeur(date);
-      if (isNaN(valeur)) {
-        setResultat("Les valeurs saisies ne sont pas valides!");
-      } else {
-        setResultat(
-          `Le patrimoine de ${patrimoine.possesseur.nom} à la date ${date.toLocaleDateString()} est de : ${valeur.toFixed(1 )} Ar`,
-        );
-      }
-    } else {
-      setResultat("Date de fin ou patrimoine non défini");
-    }
-  };
-
+  
   const handleCloseCreateModal = () => setShowCreateModal(false);
   const handleShowCreateModal = () => setShowCreateModal(true);
 
@@ -109,41 +77,61 @@ const PossessionsTable = () => {
   const handleShowUpdateModal = (possession) => {
     setSelectedPossession(possession);
     setUpdateLibelle(possession.libelle);
-    setUpdateDateFin(possession.dateFin || "");
+    setUpdateDateFin(possession.dateFin ? new Date(possession.dateFin).toISOString().substring(0, 10) : "");
     setShowUpdateModal(true);
   };
 
-  const handleUpdatePossession = () => {
+  const handleUpdatePossession = async () => {
     if (!selectedPossession) return;
 
-    fetch(`http://localhost:3000/possession/${selectedPossession.libelle}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        libelle: updateLibelle,
-        dateFin: updateDateFin
-      }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to update possession");
-        }
-        return response.json();
-      })
-      .then(() => {
-        setPossessions((prev) =>
-          prev.map((pos) =>
-            pos.libelle === selectedPossession.libelle
-              ? { ...pos, libelle: updateLibelle, dateFin: updateDateFin }
-              : pos,
-          ),
-        );
-        handleCloseUpdateModal();
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        alert("Erreur lors de la mise à jour de la possession");
+    try {
+      const response = await fetch(`http://localhost:3000/possession/${selectedPossession.libelle}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          libelle: updateLibelle,
+          dateFin: updateDateFin,
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error("Failed to update possession");
+      }
+
+      setPossessions((prev) =>
+        prev.map((pos) =>
+          pos.libelle === selectedPossession.libelle
+            ? { ...pos, libelle: updateLibelle, dateFin: updateDateFin }
+            : pos
+        )
+      );
+      handleCloseUpdateModal();
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Erreur lors de la mise à jour de la possession");
+    }
+  };
+
+  const handleClosePossession = async (libelle) => {
+    try {
+      const response = await fetch(`http://localhost:3000/possession/${libelle}/close`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to close possession");
+      }
+
+      setPossessions((prev) =>
+        prev.map((pos) =>
+          pos.libelle === libelle ? { ...pos, dateFin: new Date().toISOString().substring(0, 10) } : pos
+        )
+      );
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Erreur lors de la fermeture de la possession");
+    }
   };
 
   return (
@@ -164,22 +152,10 @@ const PossessionsTable = () => {
           {possessions.map((possession, index) => (
             <tr key={index}>
               <td>{possession.libelle}</td>
-              <td>
-                {possession instanceof Flux
-                  ? "0 Ar"
-                  : `${possession.valeur} Ar`}
-              </td>
+              <td>{possession instanceof Flux ? "0 Ar" : `${possession.valeur} Ar`}</td>
               <td>{new Date(possession.dateDebut).toLocaleDateString()}</td>
-              <td>
-                {possession.dateFin
-                  ? new Date(possession.dateFin).toLocaleDateString()
-                  : "Non défini"}
-              </td>
-              <td>
-                {possession.tauxAmortissement
-                  ? `${possession.tauxAmortissement} %`
-                  : ""}
-              </td>
+              <td>{possession.dateFin ? new Date(possession.dateFin).toLocaleDateString() : "Non défini"}</td>
+              <td>{possession.tauxAmortissement ? `${possession.tauxAmortissement} %` : ""}</td>
               <td className="container d-flex justify-content-around">
                 <Button
                   onClick={() => handleShowUpdateModal(possession)}
@@ -199,34 +175,11 @@ const PossessionsTable = () => {
         </tbody>
       </Table>
 
-        <Button variant="success" onClick={handleShowCreateModal} className="container d-flex justify-content-center mt-6">
-          Ajouter une nouvelle possession
-        </Button>
+      <Button variant="success" onClick={handleShowCreateModal} className="container d-flex justify-content-center mt-6">
+        Ajouter une nouvelle possession
+      </Button>
 
-      <div id="dateFinContainer" className="container d-flex justify-content-evenly mt-4">
-        <Form.Group controlId="dateFin">
-          <Form.Control
-            type="date"
-            value={dateFin}
-            onChange={(e) => setDateFin(e.target.value)}
-            className="w-100 border border-dark"
-          />
-        </Form.Group>
-        <Button id="btn" onClick={handleCalculate}>
-          Calculer le patrimoine
-        </Button>
-        
-      </div>
-
-      <Form.Group controlId="resultat" className="mt-4">
-        <Form.Control
-          type="text"
-          placeholder="Résultat"
-          value={resultat}
-          readOnly
-          className="container border border-dark"s
-        />
-      </Form.Group>
+     
 
       <Modal show={showCreateModal} onHide={handleCloseCreateModal}>
         <Modal.Header closeButton>
@@ -247,33 +200,31 @@ const PossessionsTable = () => {
           <Modal.Title>Mettre à jour la possession</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {selectedPossession && (
-            <Form>
-              <Form.Group controlId="updateLibelle">
-                <Form.Label>Libellé</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={updateLibelle}
-                  onChange={(e) => setUpdateLibelle(e.target.value)}
-                />
-              </Form.Group>
-              <Form.Group controlId="updateDateFin">
-                <Form.Label>Date de Fin</Form.Label>
-                <Form.Control
-                  type="date"
-                  value={updateDateFin}
-                  onChange={(e) => setUpdateDateFin(e.target.value)}
-                />
-              </Form.Group>
-            </Form>
-          )}
+          <Form>
+            <Form.Group controlId="updateLibelle">
+              <Form.Label>Libellé</Form.Label>
+              <Form.Control
+                type="text"
+                value={updateLibelle}
+                onChange={(e) => setUpdateLibelle(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group controlId="updateDateFin">
+              <Form.Label>Date de fin</Form.Label>
+              <Form.Control
+                type="date"
+                value={updateDateFin}
+                onChange={(e) => setUpdateDateFin(e.target.value)}
+              />
+            </Form.Group>
+          </Form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseUpdateModal}>
             Annuler
           </Button>
           <Button variant="primary" onClick={handleUpdatePossession}>
-            update
+            Enregistrer
           </Button>
         </Modal.Footer>
       </Modal>

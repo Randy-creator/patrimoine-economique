@@ -1,5 +1,5 @@
-import Personne from "../models/Personne.js";
-import Possession from "../models/possessions/Possession.js";
+import Personne from "./models/Personne.js"
+import Possession from "./models/possessions/Possession.js";
 import { readFile, writeFile } from "../data/index.js";
 
 const possesseur = new Personne("John Doe");
