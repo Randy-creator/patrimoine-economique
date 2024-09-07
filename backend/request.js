@@ -85,6 +85,7 @@ app.get("/patrimoine/:date", (req, res) => {
     .catch((err) => res.status(400).send({ status: "failed", error: err }));
 });
 
-app.listen(port, () => {
-  console.log(`Patrimoine app listening on port ${port}`);
+app.listen(port, '0.0.0.0', () => {
+
+  console.log(`Patrimoine app listening on port http://0.0.0.0${port}`);
 });
